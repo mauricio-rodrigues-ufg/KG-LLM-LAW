@@ -1,23 +1,23 @@
 
-# Prompts da Indexação
+# Indexing Prompts
 
-## Prompt para Extração de Entidades do Tipo Documento
+## Prompt for Document-Type Entity Extraction
 
-**Objetivo**
+**Objective**
 
-Dado um documento de texto, descubra qual o nome do documento e resuma-o em no máximo 100 palavras. Caso o documento cite outro documento, inclua essa informação no resumo.
+Given a text document, determine the document's name and summarize it in up to 100 words. If the document cites another document, include that information in the summary.
 
-No nome do documento, inclua somente o tipo e o identificador. Exemplo: `PORTARIA Nº 13/1998 - SEC-CEXTERNO` terá o nome `PORTARIA 13/1998`.
+In the document name, include only the type and the identifier. Example: `PORTARIA Nº 13/1998 - SEC-CEXTERNO` should have the name `PORTARIA 13/1998`.
 
-A saída deve ter o formato:
+The output must follow the format:
 ```
-{{initial_delimiter}}nome|||resumo{{completion_delimiter}}
+{{initial_delimiter}}name|||summary{{completion_delimiter}}
 ```
-Retorne em português. Use `{{initial_delimiter}}` como token inicial e `{{completion_delimiter}}` como token final.
+Return in Portuguese. Use `{{initial_delimiter}}` as the start token and `{{completion_delimiter}}` as the end token.
 
-### Exemplo
+### Example
 
-**Entrada:**
+**Input:**
 ```
 RESOLUÇÃO Nº 68/1965
 
@@ -28,26 +28,26 @@ Instruções sobre Fundos Rotativos, mandadas observar no Tribunal de Contas.
 O TRIBUNAL DE CONTAS DO ESTADO DE GOIÁS...
 ```
 
-**Saída:**
+**Output:**
 ```
-{{initial_delimiter}}RESOLUÇÃO 68/1965|||A Resolução nº 68/1965, do Tribunal de Contas do Estado de Goiás, estabelece normas regimentais para a gestão e fiscalização de Fundos Rotativos, incluindo instruções para pagamentos, movimentação e julgamento das prestações de contas trimestrais, conforme o artigo 31 da Constituição Estadual.{{completion_delimiter}}
+{{initial_delimiter}}RESOLUÇÃO 68/1965|||The Resolution No. 68/1965 of the Tribunal de Contas do Estado de Goiás establishes the regimental guidelines for the management and oversight of Revolving Funds, including instructions for payments, transactions, and the quarterly audit of financial statements, in accordance with Article 31 of the State Constitution.{{completion_delimiter}}
 ```
 
-## Prompt para o Pré-Processamento de Texto
+## Prompt for Text Preprocessing
 
-**Objetivo**
+**Objective**
 
-Dado um texto jurídico, identifique as seções e altere o nome dos artigos especificando o documento ao qual pertencem.
+Given a legal text, identify its sections and rename the articles by specifying the document to which they belong.
 
-**Etapas**
+**Steps**
 
-1. Identificar as seções: Introdução, Artigo 1, Artigo 2, ..., Artigo N e Conclusão.  
-2. Nas seções de artigos, renomear cada artigo para: `Art. N do DOCUMENTO: <texto>`.  
-3. Retornar o texto em português, usando `{{initial_delimiter}}` no início e `{{completion_delimiter}}` no final.
+1. Identify the sections: Introduction, Article 1, Article 2, ..., Article N, and Conclusion.  
+2. In the article sections, rename each article to: `Art. N of DOCUMENT: <text>`.  
+3. Return the text in Portuguese, using `{{initial_delimiter}}` at the beginning and `{{completion_delimiter}}` at the end.
 
-### Exemplo
+### Example
 
-**Entrada:**
+**Input:**
 ```
 TRIBUNAL DE CONTAS DO ESTADO DE GOIÁS  
 
@@ -62,93 +62,93 @@ CUMPRA-SE E PUBLIQUE-SE.
 SECRETARIA DE CONTROLE EXTERNO DO TRIBUNAL DE CONTAS DO ESTADO DE GOIÁS em Goiânia aos 15 de fevereiro de 2024.
 ```
 
-**Saída:**
+**Output:**
 ```
 {{initial_delimiter}}
 TRIBUNAL DE CONTAS DO ESTADO DE GOIÁS  
 
 PORTARIA Nº 1/2024 - SEC-CEXTERNO  
 
-Designa equipe de fiscalização para realização de Acompanhamento da concessão do Parque Estadual da Serra de Caldas Novas – PESCaN.  
+Designates the inspection team responsible for monitoring the concession of the Serra de Caldas Novas State Park – PESCaN.  
 
-Art.1º da Portaria Nº 1/2024: Designar os servidores Letícia da Silva Manchini e Valdo de Sousa Filho, sob a coordenação de Vânia Mara de Souza e Silva.  
-Art.2º da Portaria Nº 1/2024: Estabelecer a data de 30/04/2024 para entrega do Relatório final de fiscalização.  
-CUMPRA-SE E PUBLIQUE-SE.  
+Art.1º of Portaria 1/2024: Assign Letícia da Silva Manchini and Valdo de Sousa Filho, under the coordination of Vânia Mara de Souza e Silva.  
+Art.2º of Portaria 1/2024: Set the date of 04/30/2024 for submission of the final inspection report.  
+COMPLY AND PUBLISH.  
 
-SECRETARIA DE CONTROLE EXTERNO DO TRIBUNAL DE CONTAS DO ESTADO DE GOIÁS em Goiânia aos 15 de fevereiro de 2024.
+SECRETARIAT OF EXTERNAL CONTROL OF THE TRIBUNAL DE CONTAS DO ESTADO DE GOIÁS in Goiânia on February 15, 2024.
 {{completion_delimiter}}
 ```
 
-## Prompt para Extração de Entidades do Tipo Artigo
+## Prompt for Article-Type Entity Extraction
 
-**Objetivo**
+**Objective**
 
-Dado um documento, identifique entidades do tipo artigo e as citações entre elas.
+Given a document, identify entities of type "article" and their inter-citations.
 
-**Etapas**
+**Steps**
 
-1. Identificar todas as entidades do tipo artigo, sem inventar.  
-2. Nomear cada entidade como `Artigo N do DOCUMENTO XX/YYYY`.  
-3. Para cada entidade, extrair:
+1. Identify all entities of type "article" without inventing any.  
+2. Name each entity as `Article N of DOCUMENT XX/YYYY`.  
+3. For each entity, extract:
    - `entity_name`
-   - `entity_type` (sempre `artigo`)
+   - `entity_type` (always `article`)
    - `entity_description`  
-4. Formatar cada registro como:
+4. Format each record as:
 ```
 entity|||<entity_name>|||<entity_type>|||<entity_description>{{record_delimiter}}
 ```
-5. Retornar em português, usando `{{initial_delimiter}}`, `{{record_delimiter}}` e `{{completion_delimiter}}`.
+5. Return in Portuguese, using `{{initial_delimiter}}`, `{{record_delimiter}}`, and `{{completion_delimiter}}`.
 
-## Prompt para Concatenação de Entidades
+## Prompt for Entity Concatenation
 
-**Objetivo**
+**Objective**
 
-Dada uma lista de entidades estruturada como `classe|||id|||nome|||tipo|||descrição`, resuma cada descrição para no máximo N caracteres, sem duplicações.
+Given a list of entities structured as `class|||id|||name|||type|||description`, summarize each description to a maximum of N characters without duplication.
 
-**Etapas**
+**Steps**
 
-1. Resumir cada descrição para no máximo `{entity_extraction_char_limit}` caracteres.  
-2. Estruturar como:
+1. Summarize each description to at most `{entity_extraction_char_limit}` characters.  
+2. Structure as:
 ```
-<classe>|||<id>|||<nome>|||<tipo>|||<nova_descrição>{{record_delimiter}}
+<class>|||<id>|||<name>|||<type>|||<new_description>{{record_delimiter}}
 ```
-3. Retornar em português, usando `{{initial_delimiter}}`, `{{record_delimiter}}` e `{{completion_delimiter}}`.
+3. Return in Portuguese, using `{{initial_delimiter}}`, `{{record_delimiter}}`, and `{{completion_delimiter}}`.
 
-## Prompt para Extração de Triplas
+## Prompt for Triple Extraction
 
-**Objetivo**
+**Objective**
 
-Dado um texto e uma lista de entidades, identifique as relações claras entre pares de entidades.
+Given a text and a list of entities, identify clear relationships between pairs of entities.
 
-**Etapas**
+**Steps**
 
-1. Para cada par relacionado, extrair:
-   - `entidade_fonte`
-   - `entidade_alvo`
-   - `descrição_relacionamento`  
-2. Formatar como:
+1. For each related pair, extract:
+   - `source_entity`
+   - `target_entity`
+   - `relationship_description`  
+2. Format as:
 ```
-relação|||<id_fonte>|||<entidade_fonte>|||<id_alvo>|||<entidade_alvo>|||<descrição>{{record_delimiter}}
+relation|||<source_id>|||<source_entity>|||<target_id>|||<target_entity>|||<description>{{record_delimiter}}
 ```
-3. Retornar em português, usando `{{initial_delimiter}}`, `{{record_delimiter}}` e `{{completion_delimiter}}`.
+3. Return in Portuguese, using `{{initial_delimiter}}`, `{{record_delimiter}}`, and `{{completion_delimiter}}`.
 
-## Prompt para Filtragem e Classificação de Triplas
+## Prompt for Triple Filtering and Classification
 
-**Objetivo**
+**Objective**
 
-Filtrar e classificar relações jurídicas em: contém, altera, revoga ou retifica.
+Filter and classify legal relations into: contains, amends, repeals, or rectifies.
 
-**Etapas**
+**Steps**
 
-1. Remover duplicatas.  
-2. Descartar relações de documento com artigo de outro documento.  
-3. Classificar cada relação:  
-   - contém  
-   - altera  
-   - revoga  
-   - retifica  
-4. Formatar como:
+1. Remove duplicates.  
+2. Discard relations between a document and an article of another document.  
+3. Classify each relationship as:
+   - contains  
+   - amends  
+   - repeals  
+   - rectifies  
+4. Format as:
 ```
-relação|||<id_fonte>|||<entidade_fonte>|||<id_alvo>|||<entidade_alvo>|||<classificação>{{record_delimiter}}
+relation|||<source_id>|||<source_entity>|||<target_id>|||<target_entity>|||<classification>{{record_delimiter}}
 ```
-5. Retornar em português, usando `{{initial_delimiter}}`, `{{record_delimiter}}` e `{{completion_delimiter}}`.
+5. Return in Portuguese, using `{{initial_delimiter}}`, `{{record_delimiter}}`, and `{{completion_delimiter}}`.
